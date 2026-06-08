@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub Stars Analyzer - 开源项目发现</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{--bg:#f0f2f5;--bg2:#ffffff;--card:#ffffff;--card-hover:#f7f8fa;--text:#12141c;--text2:#4d5a6e;--text3:#8895a7;--blue:#2563eb;--blue-dark:#1d4ed8;--purple:#7c5cfc;--green:#0ea776;--orange:#e68a2e;--pink:#e8538a;--cyan:#0891b2;--border:#dfe5ed;--shadow:0 1px 4px rgba(0,0,0,0.04);--shadow-hover:0 6px 20px rgba(37,99,235,0.08),0 1px 4px rgba(0,0,0,0.04);--shadow-lg:0 12px 40px rgba(0,0,0,0.1);--r:16px;--rs:12px;--blue-bg:rgba(37,99,235,0.06);--green-bg:rgba(14,167,118,0.06);--orange-bg:rgba(230,138,46,0.06)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;font-size:16px;line-height:1.6}
+h1,h2,h3,h4,h5,h6,.logo-text h1,.sec-t,.cat-title,.rn,.modal-title,.stat-n{font-family:"Outfit",sans-serif;letter-spacing:-0.02em}
+.container{max-width:1100px;margin:0 auto;padding:0 28px}
+header{background:rgba(255,255,255,0.88);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
+.header-inner{max-width:1100px;margin:0 auto;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.logo{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text)}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;box-shadow:0 3px 10px rgba(37,99,235,0.2)}
+.logo-text h1{font-size:17px;font-weight:700;letter-spacing:-0.2px}
+.logo-text p{font-size:11px;color:var(--text3)}
+.h-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.search-wrap{position:relative}
+.search-wrap i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px;pointer-events:none}
+.search-wrap input{background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:10px 16px 10px 38px;font-size:14px;color:var(--text);outline:none;width:220px;font-family:inherit;transition:all .25s}
+.search-wrap input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-bg);width:260px}
+.search-wrap input::placeholder{color:var(--text3)}
+.btn{padding:9px 18px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .2s;text-decoration:none;color:#fff;font-family:inherit}
+.btn-primary{background:var(--blue);box-shadow:0 3px 12px rgba(37,99,235,0.22)}
+.btn-primary:hover{background:var(--blue-dark);transform:translateY(-1px);box-shadow:0 6px 18px rgba(37,99,235,0.3)}
+.btn-outline{background:var(--bg2);border:1px solid var(--border);color:var(--text2)}
+.btn-outline:hover{background:var(--card-hover);border-color:#cbd5e1;color:var(--text)}
+.btn-sm{padding:6px 12px;font-size:13px;border-radius:8px}
+.lang-btn{background:var(--bg);border:1px solid var(--border)!important;color:var(--text2);font-size:14px;font-weight:600;padding:7px 12px;border-radius:8px;min-width:40px;justify-content:center}
+.lang-btn.active{border-color:var(--blue)!important;color:var(--blue)!important;background:var(--blue-bg)!important}
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:20px 0;border-bottom:1px solid var(--border);margin-bottom:20px}
+.stat-c{background:var(--bg2);border-radius:var(--rs);padding:18px 16px;border:1px solid var(--border);text-align:center;transition:all .25s cubic-bezier(0.4,0,0.2,1)}
+.stat-c:hover{box-shadow:var(--shadow-hover);border-color:var(--blue);transform:translateY(-2px)}
+.stat-n{font-size:32px;font-weight:800;color:var(--text);letter-spacing:-0.5px;margin-bottom:2px}
+.stat-l{font-size:13px;color:var(--text3);margin-top:2px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px}
+.stat-n .accent{color:var(--blue)}
+.sec{padding:0 0 24px}
+.sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:14px}
+.sec-t{font-size:24px;font-weight:700;display:flex;align-items:center;gap:8px;letter-spacing:-0.3px;color:var(--text)}
+.sec-st{font-size:15px;color:var(--text3);margin-top:2px}
+.tabs{display:flex;gap:3px;flex-wrap:wrap;background:var(--bg);padding:4px;border-radius:12px;border:1px solid var(--border)}
+.tab{padding:8px 16px;border-radius:8px;background:transparent;border:none;color:var(--text3);cursor:pointer;font-size:14px;font-weight:600;transition:all .2s;font-family:inherit}
+.tab:hover{color:var(--text);background:var(--card-hover)}
+.tab.active{background:var(--bg2);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,0.06);font-weight:700}
+.cat-section{margin-bottom:20px;background:var(--bg2);border-radius:var(--r);padding:20px;border:1px solid var(--border);transition:all .2s}
+.cat-section:hover{border-color:#d1d9e6;box-shadow:var(--shadow)}
+.cat-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.cat-title{font-size:20px;font-weight:700;display:flex;align-items:center;gap:6px;color:var(--text)}
+.cat-title i{color:var(--blue);font-size:16px}
+.cat-desc{font-size:14px;color:var(--text3);margin-top:2px;font-weight:400}
+.cat-count{display:inline-block;background:var(--bg);color:var(--text3);padding:2px 10px;border-radius:5px;font-size:12px;font-weight:600}
+.repo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.rc{background:var(--bg2);border-radius:var(--rs);padding:16px;border:1px solid var(--border);cursor:pointer;transition:all .25s cubic-bezier(0.4,0,0.2,1);position:relative}
+.rc:hover{background:var(--card-hover);border-color:#d1d9e6;transform:translateY(-2px);box-shadow:var(--shadow-hover)}
+.rc:active{transform:translateY(0)}
+.rk{position:absolute;top:10px;right:10px;background:var(--bg);color:var(--text3);width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;border:1px solid var(--border)}
+.rn{font-size:18px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px;letter-spacing:-0.1px}
+.rn i{color:var(--blue);font-size:15px}
+.rd{font-size:15px;color:var(--text2);line-height:1.6;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rt{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.rt span{font-size:12px;padding:3px 10px;border-radius:5px;background:var(--blue-bg);color:var(--blue);font-weight:500;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rm{display:flex;gap:16px;font-size:14px;color:var(--text3);flex-wrap:wrap;align-items:center}
+.rm span{display:flex;align-items:center;gap:4px;font-weight:500}
+.rm .stars{color:var(--orange)}
+.rm .forks{color:var(--green)}
+.lang-tag{padding:2px 10px;border-radius:5px;background:var(--bg);font-size:12px;font-weight:500;color:var(--text3);border:1px solid var(--border)}
+.growth-tag{font-size:12px;padding:2px 10px;border-radius:5px;font-weight:600;margin-left:auto}
+.growth-high{color:#059669;background:rgba(16,185,129,0.08)}
+.growth-mid{color:#d97706;background:rgba(245,158,11,0.08)}
+.stars-bar{height:3px;background:var(--border);border-radius:2px;margin-top:12px;overflow:hidden}
+.stars-bar-fill{height:100%;background:linear-gradient(90deg,var(--blue),#60a5fa);border-radius:2px;transition:width .5s}
+.modal-o{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.35);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);z-index:1000;align-items:center;justify-content:center;padding:20px;animation:mof .2s ease}
+@keyframes mof{from{opacity:0}to{opacity:1}}
+.modal-o.active{display:flex}
+.modal{background:var(--bg2);border-radius:14px;width:100%;max-width:780px;max-height:85vh;overflow-y:auto;padding:24px;border:1px solid var(--border);box-shadow:var(--shadow-lg);position:relative;animation:mmf .25s ease}
+@keyframes mmf{from{opacity:0;transform:translateY(10px) scale(0.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+.modal-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:8px;border:none;background:var(--bg);color:var(--text3);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;font-family:inherit;transition:all .15s}
+.modal-close:hover{background:#f1f5f9;color:var(--text)}
+.owner-bar{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.owner-bar img{width:32px;height:32px;border-radius:50%;border:2px solid var(--border)}
+.owner-bar .owner-name{font-weight:700;font-size:14px}
+.owner-bar .owner-sub{font-size:12px;color:var(--text3)}
+.owner-bar .growth-badge{margin-left:auto;padding:4px 10px;border-radius:6px;font-weight:600;font-size:13px}
+.modal-title{font-size:22px;font-weight:700;word-break:break-all;margin-bottom:14px;letter-spacing:-0.2px}
+.modal-title a{color:var(--text);text-decoration:none}
+.modal-title a:hover{color:var(--blue)}
+.modal-stats{display:flex;gap:30px;margin:18px 0 22px;flex-wrap:wrap}
+.ms-item{text-align:center;min-width:90px}
+.ms-n{font-size:24px;font-weight:800;letter-spacing:-0.2px}
+.ms-l{font-size:13px;color:var(--text3);margin-top:2px;font-weight:500}
+.modal-topics{display:flex;gap:5px;flex-wrap:wrap;margin:12px 0}
+.modal-topics span{background:var(--blue-bg);color:var(--blue);padding:4px 12px;border-radius:5px;font-size:13px;font-weight:500}
+.modal-desc{font-size:16px;color:var(--text2);line-height:1.7;margin:14px 0;padding:18px;background:var(--bg);border-radius:var(--rs);border:1px solid var(--border)}
+.modal-desc strong{color:var(--text);display:block;margin-bottom:6px;font-size:15px;font-weight:600}
+.more-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0;font-size:14px}
+.more-stats > div{background:var(--bg);padding:12px 16px;border-radius:8px;border:1px solid var(--border)}
+.more-stats .label{color:var(--text3);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.2px}
+.more-stats .value{color:var(--text);font-weight:700;font-size:16px;margin-top:2px}
+.modal-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px;padding-top:16px;border-top:1px solid var(--border)}
+.modal-actions a{padding:10px 24px;font-size:14px;font-weight:600}
+.loading-c{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;gap:16px}
+.loading-s{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes shim{0%{background-position:-400px 0}100%{background-position:400px 0}}
+.skel{background:linear-gradient(90deg,var(--border) 25%,#e8ecf2 50%,var(--border) 75%);background-size:800px 100%;animation:shim 1.5s infinite;border-radius:8px}
+.skel-h{height:24px;width:70%;margin-bottom:14px}
+.skel-t{height:16px;width:100%;margin-bottom:8px}
+.skel-t.w60{width:60%}.skel-t.w40{width:40%}
+.skel-card{padding:24px;border-radius:var(--rs);border:1px solid var(--border);background:var(--bg2);margin-bottom:16px}
+.skel-row{display:flex;gap:40px;margin:12px 0}
+.skel-dot{width:12px;height:12px;border-radius:50%;background:var(--border);display:inline-block}
+.loading-t{font-size:16px;color:var(--text2);font-weight:500}
+.loading-st{font-size:13px;color:var(--text3);text-align:center}
+.fade-in{animation:fi .3s ease}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.empty{text-align:center;padding:50px 20px;color:var(--text3)}
+.empty i{font-size:40px;margin-bottom:14px;opacity:0.25}
+footer{text-align:center;padding:24px 0;border-top:1px solid var(--border);color:var(--text3);font-size:12px;margin-top:24px}
+footer a{color:var(--blue);text-decoration:none}
+@media(max-width:768px){.repo-grid{grid-template-columns:1fr}.stats-bar{grid-template-columns:repeat(2,1fr)}.modal{padding:20px}header .header-inner{flex-direction:column;align-items:stretch}.search-wrap input{width:100%}.search-wrap input:focus{width:100%}}
+</style>
+</head>
+<body>
+<header>
+<div class="header-inner">
+<a href="/" class="logo">
+<div class="logo-icon"><i class="fas fa-star"></i></div>
+<div class="logo-text"><h1>Stars Analyzer</h1><p id="logoSub">GitHub 开源项目发现</p></div>
+</a>
+<div class="h-right">
+<div class="search-wrap"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="搜索项目..." oninput="onSearch()"></div>
+<button class="btn lang-btn" data-lang="zh" onclick="toggleLang()">中</button>
+<button class="btn lang-btn" data-lang="en" onclick="toggleLang()">EN</button>
+<button class="btn btn-outline" id="ghBtn" onclick="ghLogin()" style="font-size:14px"><i class="fab fa-github"></i> <span id="ghText">登录</span></button>
+<button class="btn btn-primary" id="rb" onclick="rd()"><i class="fas fa-sync-alt"></i> <span id="rbText">刷新</span></button>
+</div>
+</div>
+</header>
+<div class="container">
+<div id="rbContainer"></div>
+<div id="app"><div class="loading-c"><div class="loading-s"></div><div class="loading-t" id="loadingText">加载中...</div></div></div>
+<footer><p>GitHub Stars Analyzer &middot; <span id="footerText">数据每周自动更新</span> &middot; <a href="https://github.com" target="_blank">GitHub</a></p></footer>
+</div>
+<div class="modal-o" id="mo" onclick="if(event.target===this)cm()"><div class="modal" id="mc"><button class="modal-close" onclick="cm()"><i class="fas fa-times"></i></button><div id="mb"><div class="loading-c"><div class="loading-s"></div></div></div></div></div>
+
+<script>
+var C=null, searchTerm='', currentView='categories', activeCat='all', activeLangGroup='all', maxStars=0, readmeCache={}, RPP=30, showCount={};
+var lang=localStorage.getItem('codex_lang')||'zh';
+var CI={ai_agent:'fa-robot',computer_science:'fa-laptop-code',llm:'fa-brain',developer_tools:'fa-tools',rising_stars:'fa-rocket'};
+var langGroups={
+  python:{label:'Python',icon:'fa-brands fa-python',langs:['Python']},
+  jsts:{label:'JS/TS',icon:'fa-brands fa-js',langs:['JavaScript','TypeScript']},
+  backend:{label:'Go/Rust/Java',icon:'fa-code',langs:['Go','Rust','Java','Kotlin','Groovy','Scala']},
+  cfamily:{label:'C/C++/C#',icon:'fa-code',langs:['C','C++','C#','Objective-C']},
+  swift:{label:'Swift/Apple',icon:'fa-brands fa-swift',langs:['Swift','Objective-C']},
+  mobile:{label:function(){return T('lang_mobile')},icon:'fa-mobile-alt',langs:['Dart','Kotlin','Swift','Objective-C','Java']},
+  data:{label:function(){return T('lang_data')},icon:'fa-chart-bar',langs:['Jupyter Notebook','R','Julia','SQL']},
+  web:{label:function(){return T('lang_web')},icon:'fa-globe',langs:['HTML','CSS','SCSS','Less','Vue','TypeScript','JavaScript']},
+  shell:{label:function(){return T('lang_shell')},icon:'fa-terminal',langs:['Shell','Dockerfile','Makefile','PowerShell','Lua']},
+  other:{label:function(){return T('lang_other')},icon:'fa-ellipsis-h',langs:[]}
+};
+
+function T(k){
+  var m={
+    total_repos:{zh:'展示/缓存',en:'Shown/Cached'},total_stars:{zh:'总Stars',en:'Total Stars'},
+    total_forks:{zh:'总Forks',en:'Total Forks'},total_langs:{zh:'编程语言',en:'Languages'},
+    browse:{zh:'浏览项目',en:'Browse Projects'},browse_sub:{zh:'发现GitHub上最值得关注的开源项目',en:'Discover the most notable open-source projects'},
+    tab_cat:{zh:'总览',en:'Overview'},tab_trend:{zh:'综合趋势',en:'Trending'},
+    tab_grow:{zh:'快速增长',en:'Fast Growth'},tab_lang:{zh:'编程语言',en:'Languages'},
+    trend_t:{zh:'综合趋势排行',en:'Trending'},trend_d:{zh:'综合评分最高的项目',en:'Highest composite score'},
+    grow_t:{zh:'快速增长项目',en:'Fastest Growing'},grow_d:{zh:'日均Stars增长最快的项目',en:'Highest daily star growth'},
+    nodata:{zh:'暂无数据',en:'No data'},loading:{zh:'加载中...',en:'Loading...'},
+    fail:{zh:'加载失败',en:'Failed'},perday:{zh:'/天',en:'/day'},
+    nodesc:{zh:'暂无详细介绍',en:'No description'},
+    github:{zh:'在GitHub上查看',en:'View on GitHub'},retry:{zh:'重试',en:'Retry'},
+    update:{zh:'更新于',en:'Updated'},refreshing:{zh:'刷新中...',en:'Refreshing...'},
+    cnt:{zh:'个项目',en:' projects'},conn_fail:{zh:'连接失败',en:'Connection failed'},
+    conn_msg:{zh:'无法连接到服务器',en:'Cannot connect to server'},
+    stars:{zh:'Stars',en:'Stars'},forks:{zh:'Forks',en:'Forks'},
+    no_match:{zh:'未找到匹配的项目',en:'No matching projects'},
+    stars_btn:{zh:'查看Stars',en:'View Stars'},readme_loading:{zh:'正在加载项目详情...',en:'Loading project details...'},
+    readme_fail:{zh:'未能加载项目详情',en:'Could not load details'},lang_label:{zh:'编程语言',en:'Language'},
+    growth:{zh:'日均增长',en:'Daily Growth'},repo_desc:{zh:'项目简介',en:'About'},features:{zh:'功能介绍',en:'Features'},
+    refresh:{zh:'刷新',en:'Refresh'},close:{zh:'关闭',en:'Close'},
+    loading_data:{zh:'正在加载数据...',en:'Loading data...'},
+    page_title:{zh:'GitHub Stars Analyzer - 开源项目发现',en:'GitHub Stars Analyzer - Discover Projects'},
+    subtitle:{zh:'GitHub 开源项目发现',en:'Discover Open Source Projects'},
+    search_placeholder:{zh:'搜索项目...',en:'Search projects...'},
+    login:{zh:'登录',en:'Login'},
+    logout:{zh:'退出',en:'Logout'},
+    footer_update:{zh:'数据每周自动更新',en:'Auto-updated weekly'},
+    all:{zh:'全部',en:'All'},
+    featured:{zh:'精选推荐',en:'Featured'},
+    featured_desc:{zh:'各分类最受关注的项目',en:"Most popular across categories"},
+    loading_more:{zh:'加载更多',en:'Load More'},
+    items:{zh:'个',en:' items'},
+    refreshing_warn:{zh:'正在刷新中，请稍候...',en:'Refreshing, please wait...'},
+    fetching:{zh:'正在抓取数据...',en:'Fetching data...'},
+    fetched:{zh:'已抓取',en:'Fetched'},
+    auto_refreshing:{zh:'自动刷新中...',en:'Auto-refreshing...'},
+    timeout_retry:{zh:'操作超时，请重试',en:'Operation timed out, please retry'},
+    login_failed:{zh:'GitHub 登录失败，请重试',en:'GitHub login failed, please retry'},
+    lang_mobile:{zh:'移动端',en:'Mobile'},
+    lang_data:{zh:'数据科学',en:'Data Science'},
+    lang_web:{zh:'Web前端',en:'Web Frontend'},
+    lang_shell:{zh:'Shell/工具',en:'Shell/Tools'},
+    lang_other:{zh:'其他',en:'Other'},
+    star_btn:{zh:'Star',en:'Star'},
+    starred_btn:{zh:'已收藏',en:'Starred'},
+    cat_ai_agent:{zh:'🤖 AI Agent',en:'🤖 AI Agent'},
+    cat_computer_science:{zh:'💻 计算机科学',en:'💻 Computer Science'},
+    cat_llm:{zh:'🧠 大语言模型',en:'🧠 LLM'},
+    cat_developer_tools:{zh:'🛠️ 开发者工具',en:'🛠️ Dev Tools'},
+    cat_rising_stars:{zh:'⭐ 潜力新星',en:'⭐ Rising Stars'},
+    desc_ai_agent:{zh:'人工智能代理框架、自主代理、多代理协作系统',en:'AI agent frameworks, autonomous agents, multi-agent systems'},
+    desc_computer_science:{zh:'机器学习、深度学习、计算机视觉、NLP 等核心领域',en:'ML, deep learning, CV, NLP and core CS fields'},
+    desc_llm:{zh:'大语言模型、对话系统、RAG、提示工程、微调',en:'LLMs, chatbots, RAG, prompt engineering, fine-tuning'},
+    desc_developer_tools:{zh:'开发者工具、CLI、AI 编程助手、效率工具',en:'Developer tools, CLI, AI coding assistants, productivity'},
+    desc_rising_stars:{zh:'近期快速增长但总体 stars 较低的高潜力项目',en:'Fast-growing, low-star, high-potential projects'},
+  };
+  var v=m[k];return v?v[lang]||v['zh']||k:k;
+}
+
+function updateStaticText(){
+  document.title=T('page_title');
+  var sub=document.getElementById('logoSub');if(sub)sub.textContent=T('subtitle');
+  var inp=document.getElementById('searchInput');if(inp)inp.placeholder=T('search_placeholder');
+  var ft=document.getElementById('footerText');if(ft)ft.textContent=T('footer_update');
+  var gh=document.getElementById('ghText');if(gh&&!ghUser)gh.textContent=T('login');
+  var rb=document.getElementById('rbText');if(rb)rb.textContent=T('refresh');
+}
+
+function toggleLang(){
+  lang=lang==='zh'?'en':'zh';
+  localStorage.setItem('codex_lang',lang);
+  var el=document.getElementById('loadingText');
+  if(el)el.textContent=T('loading_data');
+  updateStaticText();
+  if(C)renderApp(C);
+  document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('active',b.dataset.lang===lang);});
+}
+
+(function(){var s=localStorage.getItem('codex_lang');if(s){document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('active',b.dataset.lang===s);})}else{document.querySelector('.lang-btn[data-lang="zh"]').classList.add('active');}
+updateStaticText();})();
+
+function fmt(n){if(n>=10000000)return(n/1000000).toFixed(1)+'M';if(n>=1000)return(n/1000).toFixed(1)+'K';return String(n)}
+function esc(t){var d=document.createElement('div');d.textContent=t;return d.innerHTML}
+function us(ok){var t=document.getElementById('loadingText');if(ok&&C){t&&(t.textContent=T('update')+' '+C.updated_at)}}
+
+function filterRepos(repos){
+  if(!repos||!repos.length)return[];
+  var items=[].concat(repos);
+  if(searchTerm){
+    var st=searchTerm.toLowerCase();
+    items=items.filter(function(r){
+      return(r.full_name||'').toLowerCase().indexOf(st)!==-1||(r.description||'').toLowerCase().indexOf(st)!==-1||(r.language||'').toLowerCase().indexOf(st)!==-1||(r.topics||[]).join(' ').toLowerCase().indexOf(st)!==-1;
+    });
+  }
+  return items;
+}
+
+function renderCards(repos,start,limit,catKey){
+  var items=filterRepos(repos);
+  if(!items.length)return '';
+  var totalCount=items.length;
+  if(limit>0)items=items.slice(0,limit);
+  var h='';
+  for(var i=0;i<items.length;i++){
+    var r=items[i],idx=start?start+i+1:i+1;
+    var s=fmt(r.stargazers_count||0),f=fmt(r.forks_count||0);
+    var lang=r.language||'',desc=r.description||T('nodesc');
+    var spd=r._stars_per_day||0;
+    var gc=spd>20?'growth-high':(spd>5?'growth-mid':'');
+    var gt=spd?spd.toFixed(1)+T('perday'):'';
+    var pct=maxStars>0?Math.round(r.stargazers_count/maxStars*100):0;
+    var topics=(r.topics||[]).slice(0,5);
+    var delay = idx * 25;
+    h+='<div class="rc fade-in" style="animation-delay:'+delay+'ms" onclick="openModal(\''+r.full_name+'\')">';
+    h+='<div class="rk">'+idx+'</div>';
+    h+='<div class="rn"><i class="fas fa-book"></i> '+esc(r.full_name)+'</div>';
+    h+='<div class="rd">'+esc(desc)+'</div>';
+    if(topics.length){h+='<div class="rt">';for(var t=0;t<topics.length;t++){h+='<span>'+esc(topics[t])+'</span>'}h+='</div>'}
+    h+='<div class="rm">';
+    h+='<span class="stars"><i class="fas fa-star"></i> '+s+'</span>';
+    h+='<span class="forks"><i class="fas fa-code-branch"></i> '+f+'</span>';
+    if(lang)h+='<span class="lang-tag">'+lang+'</span>';
+    if(gt)h+='<span class="growth-tag '+gc+'">'+gt+'</span>';
+    h+='</div>';
+    h+='<div class="stars-bar"><div class="stars-bar-fill" style="width:'+pct+'%"></div></div>';
+    h+='</div>';
+  }
+  if(catKey && totalCount > (limit||totalCount)){
+    h+='<div style="text-align:center;padding:16px 0 4px"><button class="btn btn-outline" onclick="loadMore(\''+catKey+'\')" style="min-width:180px;justify-content:center"><i class="fas fa-chevron-down"></i> '+T('loading_more')+' ('+(totalCount-(limit||totalCount))+T('items')+')</button></div>';
+  }
+  return h;
+}
+function loadMore(k){
+  var step=k==='_trend'?50:k==='_grow'?100:RPP;
+  showCount[k]=(showCount[k]||step)+step;
+  if(currentView==='trending')viewTrend();
+  else if(currentView==='fastGrowing')viewGrow();
+  else viewCat();
+}
+
+function filterCat(k){activeCat=k;showCount={};viewCat();}
+
+function viewCat(){
+  var d=C,h='';
+  // 筛选导航（包含 rising_stars）
+  var allKeys=Object.keys(d.categories||{});
+  var nav='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px">';
+  nav+='<button class="btn '+(activeCat==='all'?'btn-primary':'btn-outline')+'" onclick="filterCat(\'all\')" style="min-width:80px;justify-content:center">'+T('all')+'</button>';
+  for(var i=0;i<allKeys.length;i++){
+    var k=allKeys[i],c=d.categories[k];if(!c)continue;
+    var ic=CI[k]||'fa-folder';
+    var catName=T('cat_'+k);if(catName.indexOf('cat_')===0)catName=c.name;
+    nav+='<button class="btn '+(activeCat===k?'btn-primary':'btn-outline')+'" onclick="filterCat(\''+k+'\')" style="flex:1;min-width:120px;justify-content:center;padding:10px 14px"><i class="fas '+ic+'"></i> '+catName+'</button>';
+  }
+  nav+='</div>';h+=nav;
+
+  if(activeCat==='all'){
+    // 全部：精选+全部分类
+    var top=[], seenFn={};
+    for(var k2 in d.categories){var r2=d.categories[k2].repos||[];for(var j=0;j<Math.min(3,r2.length);j++){var fn=r2[j].full_name;if(!seenFn[fn]&&(!searchTerm||filterRepos([r2[j]]).length)){seenFn[fn]=true;top.push(r2[j]);}}}
+    if(top.length)h+='<div class="cat-section fade-in"><div class="cat-header"><div><div class="cat-title"><i class="fas fa-star" style="color:var(--orange)"></i> '+T('featured')+'</div><div class="cat-desc">'+T('featured_desc')+'</div></div></div><div class="repo-grid">'+renderCards(top)+'</div></div>';
+    for(var k3 in d.categories){
+      var c3=d.categories[k3],ic=CI[k3]||'fa-folder',r3=c3.repos||[];
+      if(!filterRepos(r3).length&&searchTerm)continue;
+      var sk=showCount[k3]||RPP;
+      var cn3=T('cat_'+k3);if(cn3.indexOf('cat_')===0)cn3=c3.name;
+      var cd3=T('desc_'+k3);if(cd3.indexOf('desc_')===0)cd3=c3.description||'';
+      h+='<div class="cat-section fade-in"><div class="cat-header"><div><div class="cat-title"><i class="fas '+ic+'"></i> '+cn3+' <span class="cat-count">'+(c3.repos?c3.repos.length:'0')+T('cnt')+'</span></div><div class="cat-desc">'+cd3+'</div></div></div><div class="repo-grid">'+renderCards(r3,0,sk,k3)+'</div></div>';
+    }
+  } else {
+    // 单个分类
+    var c4=d.categories[activeCat];
+    if(c4){
+      var ic4=CI[activeCat]||'fa-folder',r4=c4.repos||[];
+      var sk4=showCount[activeCat]||RPP;
+      var cn4=T('cat_'+activeCat);if(cn4.indexOf('cat_')===0)cn4=c4.name;
+      var cd4=T('desc_'+activeCat);if(cd4.indexOf('desc_')===0)cd4=c4.description||'';
+      if(filterRepos(r4).length)h+='<div class="cat-section fade-in"><div class="cat-header"><div><div class="cat-title"><i class="fas '+ic4+'"></i> '+cn4+' <span class="cat-count">'+r4.length+T('cnt')+'</span></div><div class="cat-desc">'+cd4+'</div></div></div><div class="repo-grid">'+renderCards(r4,0,sk4,activeCat)+'</div></div>';
+    }
+  }
+  if(!h)h='<div class="empty"><i class="fas fa-search"></i><p>'+T('no_match')+'</p></div>';
+  document.getElementById('vc').innerHTML=h;
+}
+
+function viewTrend(){
+  var r=C.global.trending;
+  if(!r||!r.length){document.getElementById('vc').innerHTML='<div class="empty"><i class="fas fa-inbox"></i><p>'+T('nodata')+'</p></div>';return}
+  if(!filterRepos(r).length){document.getElementById('vc').innerHTML='<div class="empty"><i class="fas fa-search"></i><p>'+T('no_match')+'</p></div>';return}
+  var limit=showCount['_trend']||50;
+  document.getElementById('vc').innerHTML='<div class="cat-section fade-in"><div class="cat-header"><div><div class="cat-title"><i class="fas fa-trophy" style="color:var(--orange)"></i> '+T('trend_t')+' <span class="cat-count">'+r.length+T('cnt')+'</span></div><div class="cat-desc">'+T('trend_d')+'</div></div></div><div class="repo-grid">'+renderCards(r,0,limit,'_trend')+'</div></div>';
+}
+
+function viewGrow(){
+  var r=C.global.fast_growing;
+  if(!r||!r.length){document.getElementById('vc').innerHTML='<div class="empty"><i class="fas fa-rocket"></i><p>'+T('grow_t')+'</p></div>';return}
+  if(!filterRepos(r).length){document.getElementById('vc').innerHTML='<div class="empty"><i class="fas fa-search"></i><p>'+T('no_match')+'</p></div>';return}
+  var limit=showCount['_grow']||100;
+  document.getElementById('vc').innerHTML='<div class="cat-section fade-in"><div class="cat-header"><div><div class="cat-title"><i class="fas fa-rocket" style="color:var(--green)"></i> '+T('grow_t')+' <span class="cat-count">'+r.length+T('cnt')+'</span></div><div class="cat-desc">'+T('grow_d')+'</div></div></div><div class="repo-grid">'+renderCards(r,0,limit,'_grow')+'</div></div>';
+}
+
+function filterLangGroup(k){activeLangGroup=k;showCount={};viewLang();}
+
+function viewLang(){
+  var lc=C.language_categories;
+  if(!lc||Object.keys(lc).length===0){document.getElementById('vc').innerHTML='<div class="empty"><i class="fas fa-code"></i><p>'+T('nodata')+'</p></div>';return}
+
+  // 收集所有编程语言到各组
+  var allLangs=Object.keys(lc).filter(function(l){return lc[l]&&lc[l].length});
+  var groupLangs={};
+  for(var gk in langGroups){groupLangs[gk]=[]}
+  var assigned={};
+  for(var gi in langGroups){
+    var g=langGroups[gi];
+    if(g.langs.length){
+      for(var li=0;li<g.langs.length;li++){
+        var ln=g.langs[li];
+        if(allLangs.indexOf(ln)!==-1 && !assigned[ln]){
+          groupLangs[gi].push(ln);
+          assigned[ln]=true;
+        }
+      }
+    }
+  }
+  // 未分组的放入 other
+  for(var ali=0;ali<allLangs.length;ali++){
+    if(!assigned[allLangs[ali]]) groupLangs['other'].push(allLangs[ali]);
+  }
+
+  // 筛选导航
+  var nav='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px">';
+  nav+='<button class="btn '+(activeLangGroup==='all'?'btn-primary':'btn-outline')+'" onclick="filterLangGroup(\'all\')" style="min-width:60px;justify-content:center">'+T('all')+'</button>';
+  for(var gk in langGroups){
+    var cnt=groupLangs[gk].length;
+    if(!cnt)continue;
+    nav+='<button class="btn '+(activeLangGroup===gk?'btn-primary':'btn-outline')+'" onclick="filterLangGroup(\''+gk+'\')" style="flex-shrink:0;padding:8px 14px;font-size:14px"><i class="'+(langGroups[gk].icon||'fa-code')+'"></i> '+(typeof langGroups[gk].label==='function'?langGroups[gk].label():langGroups[gk].label)+' <span style="font-weight:400;opacity:0.7">'+cnt+'</span></button>';
+  }
+  nav+='</div>';
+
+  var h=nav;
+  if(activeLangGroup==='all'){
+    for(var l in lc){
+      var r=lc[l];if(!r||!r.length)continue;
+      if(!filterRepos(r).length&&searchTerm)continue;
+      h+='<div class="cat-section fade-in"><div class="cat-header"><div><div class="cat-title"><i class="fas fa-code" style="color:var(--cyan)"></i> '+esc(l)+' <span class="cat-count">'+r.length+T('cnt')+'</span></div></div></div><div class="repo-grid">'+renderCards(r.slice(0,10))+'</div></div>';
+    }
+  } else {
+    var langs=groupLangs[activeLangGroup];
+    if(!langs||!langs.length){h+='<div class="empty"><p>'+T('nodata')+'</p></div>'}
+    else {
+      for(var li=0;li<langs.length;li++){
+        var l=langs[li],r=lc[l];if(!r||!r.length)continue;
+        if(!filterRepos(r).length&&searchTerm)continue;
+        h+='<div class="cat-section fade-in"><div class="cat-header"><div><div class="cat-title"><i class="fas fa-code" style="color:var(--cyan)"></i> '+esc(l)+' <span class="cat-count">'+r.length+T('cnt')+'</span></div></div></div><div class="repo-grid">'+renderCards(r.slice(0,10))+'</div></div>';
+      }
+    }
+  }
+  if(h===nav)h+='<div class="empty"><i class="fas fa-search"></i><p>'+T('no_match')+'</p></div>';
+  document.getElementById('vc').innerHTML=h;
+}
+
+function switchView(v,b){
+  currentView=v;
+  var t=document.querySelectorAll('.tab');
+  for(var i=0;i<t.length;i++)t[i].classList.remove('active');
+  b.classList.add('active');
+  if(v==='categories')viewCat();
+  else if(v==='trending')viewTrend();
+  else if(v==='fastGrowing')viewGrow();
+  else if(v==='languages')viewLang();
+}
+
+function onSearch(){
+  searchTerm=document.getElementById('searchInput').value;
+  if(currentView==='categories')viewCat();
+  else if(currentView==='trending')viewTrend();
+  else if(currentView==='fastGrowing')viewGrow();
+  else if(currentView==='languages')viewLang();
+}
+
+function renderApp(d){
+  C=d;var s=d.stats;maxStars=0;
+  for(var k in d.categories){var repos=d.categories[k].repos||[];for(var i=0;i<repos.length;i++){if(repos[i].stargazers_count>maxStars)maxStars=repos[i].stargazers_count;}}
+  statsGlobal=d.global||{};
+  for(var key in statsGlobal){var arr=statsGlobal[key];if(Array.isArray(arr)){for(var i=0;i<arr.length;i++){if(arr[i].stargazers_count>maxStars)maxStars=arr[i].stargazers_count;}}}
+
+  var displayed=0;for(var ck in d.categories){var cr=d.categories[ck].repos||[];displayed+=cr.length;}
+  var h='<div class="stats-bar fade-in">';
+  h+='<div class="stat-c"><div class="stat-n" style="font-size:26px">'+fmt(displayed)+' <span style="font-size:16px;opacity:0.5">/</span> '+fmt(s.total_repos)+'</div><div class="stat-l">'+T('total_repos')+'</div></div>';
+  h+='<div class="stat-c"><div class="stat-n">'+fmt(s.total_stars)+'</div><div class="stat-l">'+T('total_stars')+'</div></div>';
+  h+='<div class="stat-c"><div class="stat-n">'+fmt(s.total_forks)+'</div><div class="stat-l">'+T('total_forks')+'</div></div>';
+  h+='<div class="stat-c"><div class="stat-n">'+s.languages_count+'</div><div class="stat-l">'+T('total_langs')+'</div></div>';
+  h+='</div>';
+  h+='<div class="sec"><div class="sec-h"><div><div class="sec-t"><i class="fas fa-compass" style="color:var(--blue)"></i> '+T('browse')+'</div><div class="sec-st">'+T('browse_sub')+'</div></div><div class="tabs">';
+  h+='<button class="tab active" onclick="switchView(\'categories\',this)"><i class="fas fa-th-large"></i> '+T('tab_cat')+'</button>';
+  h+='<button class="tab" onclick="switchView(\'trending\',this)"><i class="fas fa-chart-line"></i> '+T('tab_trend')+'</button>';
+  h+='<button class="tab" onclick="switchView(\'fastGrowing\',this)"><i class="fas fa-rocket"></i> '+T('tab_grow')+'</button>';
+  h+='<button class="tab" onclick="switchView(\'languages\',this)"><i class="fas fa-code"></i> '+T('tab_lang')+'</button>';
+  h+='</div></div><div id="vc"></div></div>';
+  document.getElementById('app').innerHTML=h;
+  viewCat();us(true);
+}
+
+function findRepo(fn){
+  if(!C)return null;
+  for(var k in C.categories){var repos=C.categories[k].repos||[];for(var i=0;i<repos.length;i++){if(repos[i].full_name===fn)return repos[i];}}
+  var g=C.global||{};
+  for(var key in g){var arr=g[key];if(Array.isArray(arr)){for(var i=0;i<arr.length;i++){if(arr[i].full_name===fn)return arr[i];}}}
+  var lc=C.language_categories||{};
+  for(var lang in lc){var arr=lc[lang];if(Array.isArray(arr)){for(var i=0;i<arr.length;i++){if(arr[i].full_name===fn)return arr[i];}}}
+  return null;
+}
+
+async function openModal(fn){
+  var o=document.getElementById('mo'),b=document.getElementById('mb');
+  o.classList.add('active');
+  b.innerHTML='<div class="loading-c"><div class="loading-s"></div><div class="loading-t">'+T('loading')+'</div></div>';
+  var r=findRepo(fn);
+  if(!r){b.innerHTML='<div class="empty"><i class="fas fa-exclamation-circle" style="color:#f87171"></i><p>'+T('fail')+'</p><button class="btn btn-primary" onclick="cm()" style="margin-top:16px">'+T('close')+'</button></div>';return}
+
+  var s=fmt(r.stargazers_count||0),f=fmt(r.forks_count||0);
+  var spd=r._stars_per_day?r._stars_per_day.toFixed(1):'0';
+  var topics=r.topics||[];
+  var topicsHtml='';
+  if(topics.length){topicsHtml='<div class="modal-topics">';for(var t=0;t<topics.length;t++){topicsHtml+='<span>#'+esc(topics[t])+'</span>'}topicsHtml+='</div>'}
+
+  var ownerHtml='';
+  if(r.owner){
+    var avatar=r.owner.avatar_url||'',oname=r.owner.login||'',ourl=r.owner.html_url||'';
+    ownerHtml='<div class="owner-bar">';
+    if(avatar)ownerHtml+='<img src="'+avatar+'" alt="">';
+    ownerHtml+='<div><div class="owner-name">'+esc(oname)+'</div><div class="owner-sub">'+esc(fn.split('/')[0]||'')+'</div></div>';
+    ownerHtml+='<span class="growth-badge '+(r._stars_per_day>20?'growth-high':(r._stars_per_day>5?'growth-mid':''))+'"><i class="fas fa-arrow-up"></i> '+spd+' '+T('perday')+'</span>';
+    ownerHtml+='</div>';
+  }
+
+  b='<div class="mh">'+ownerHtml;
+  b+='<div class="modal-title"><a href="'+(r.html_url||'https://github.com/'+fn)+'" target="_blank">'+esc(fn)+'</a></div>';
+  b+='<div class="modal-stats"><div class="ms-item"><div class="ms-n" style="color:var(--orange)">'+s+'</div><div class="ms-l">'+T('stars')+'</div></div>';
+  b+='<div class="ms-item"><div class="ms-n" style="color:var(--green)">'+f+'</div><div class="ms-l">'+T('forks')+'</div></div>';
+  if(r.language){b+='<div class="ms-item"><div class="ms-n" style="color:var(--cyan);font-size:20px">'+esc(r.language)+'</div><div class="ms-l">'+T('lang_label')+'</div></div>';}
+  b+='</div>'+topicsHtml;
+  b+='<div class="modal-desc"><strong>'+T('repo_desc')+'</strong>'+esc(r.description||T('nodesc'))+'</div>';
+  b+='<div class="more-stats"><div><div class="label">'+T('growth')+'</div><div class="value" style="color:var(--green)">'+spd+' '+T('perday')+'</div></div>';
+  b+='<div><div class="label">'+T('lang_label')+'</div><div class="value" style="color:var(--blue)">'+esc(r.language||'N/A')+'</div></div></div>';
+
+  // 异步加载 README 摘要
+  b+='<div id="readmeSection" style="margin-top:16px"><div class="loading-c" style="min-height:60px"><div class="loading-s" style="width:24px;height:24px"></div><div class="loading-t" style="font-size:14px">'+T('readme_loading')+'</div></div></div>';
+
+  b+='<div class="modal-actions">';
+  b+='<a href="'+(r.html_url||'https://github.com/'+fn)+'" target="_blank" class="btn btn-primary" style="display:inline-flex"><i class="fab fa-github"></i> '+T('github')+'</a>';
+  b+='<button class="btn btn-outline" onclick="ghStar(\''+fn+'\',this)" data-starred="0" style="display:inline-flex"><i class="far fa-star"></i> '+T('star_btn')+'</button>';
+  b+='<a href="'+(r.html_url||'https://github.com/'+fn)+'/stargazers" target="_blank" class="btn btn-outline" style="display:inline-flex"><i class="fas fa-star"></i> '+T('stars_btn')+'</a>';
+  b+='</div></div>';
+  document.getElementById('mb').innerHTML=b;
+
+  // 异步加载 README
+  try{
+    var rd=readmeCache[fn];
+    if(!rd){var resp=await fetch('/api/repo/readme/'+encodeURIComponent(fn));rd=await resp.json();readmeCache[fn]=rd;}
+    var rs=document.getElementById('readmeSection');
+    if(rd.readme_summary && rd.readme_summary.indexOf('暂无详细描述') === -1){
+      var paras = rd.readme_summary.split(/[。！？\n]+/).filter(function(p){return p.trim().length > 10});
+      var h = '<h3 style="font-size:18px;margin-bottom:12px;display:flex;align-items:center;gap:6px"><i class="fas fa-file-alt" style="color:var(--blue)"></i> '+T('features')+'</h3><div style="max-height:450px;overflow-y:auto;padding:4px 0">';
+      for(var pi=0; pi<paras.length; pi++){var p=esc(paras[pi].trim()); if(p) h += '<p style="margin-bottom:10px;line-height:1.7;font-size:15px;color:var(--text2)">'+p+'。</p>';}
+      h += '</div>';
+      rs.innerHTML = h;
+    }else{
+      rs.innerHTML='';
+    }
+  }catch(e){
+    var rs=document.getElementById('readmeSection');
+    if(rs)rs.innerHTML='<div class="empty" style="padding:20px"><i class="fas fa-exclamation-circle" style="color:var(--text3);font-size:20px"></i></div>';
+  }
+}
+
+function cm(){document.getElementById('mo').classList.remove('active')}
+
+// ── Toast 提示 ──
+function toast(msg, type){
+  var t=document.createElement('div');
+  t.style.cssText='position:fixed;top:24px;right:24px;z-index:9999;padding:14px 20px;border-radius:10px;font-size:15px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,0.12);animation:fi .25s ease;max-width:360px';
+  t.style.background=type==='warn'?'#fef3c7':'var(--green-bg)';
+  t.style.color=type==='warn'?'#92400e':'var(--green)';
+  t.style.border='1px solid '+(type==='warn'?'#fde68a':'var(--green)');
+  t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(function(){t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(function(){t.remove()},300);},2500);
+}
+
+var refreshing=false, rci=null;
+
+async function rd(){
+  if(refreshing){
+    toast(T('refreshing_warn'),'warn');
+    return;
+  }
+  refreshing=true;
+  var btn=document.getElementById('rb');
+  btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> '+T('refresh')+'...';
+  var bar=document.getElementById('rbBar');
+  if(!bar){
+    bar=document.createElement('div');bar.id='rbBar';
+    bar.style.cssText='background:linear-gradient(135deg,#eef2ff,#e0e7ff);border:1px solid #a5b4fc;border-radius:14px;padding:18px 24px;margin-bottom:24px;display:flex;align-items:center;gap:14px;font-size:16px;font-weight:600;color:#4338ca;box-shadow:0 4px 16px rgba(99,102,241,0.15);animation:fi .3s ease';
+    bar.innerHTML='<div style="width:28px;height:28px;border:3px solid #a5b4fc;border-top-color:#4338ca;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0"></div><div style="flex:1"><div style="margin-bottom:6px" id="rbStat">'+T('fetching')+'</div><div style="background:#c7d2fe;border-radius:6px;height:6px;overflow:hidden"><div id="rbProg" style="background:linear-gradient(90deg,#6366f1,#818cf8);border-radius:6px;height:100%;width:0%;transition:width .5s ease"></div></div></div>';
+    document.getElementById('rbContainer').appendChild(bar);
+  }else{
+    bar.style.display='flex';
+    document.getElementById('rbStat').textContent=T('fetching');
+    document.getElementById('rbProg').style.width='0%';
+  }
+  try{await fetch('/api/refresh');}catch(e){}
+  if(rci)clearInterval(rci);
+  var pollStart=Date.now();
+  rci=setInterval(async function(){
+    try{
+      var r=await fetch('/api/status');var s=await r.json();
+      var elapsed=Math.min((Date.now()-pollStart)/180000,1);
+      var pct=Math.round(elapsed*70+5);
+      var prog=document.getElementById('rbProg');
+      if(prog)prog.style.width=Math.min(pct,90)+'%';
+      if(!s.refreshing){
+        clearInterval(rci);rci=null;refreshing=false;
+        btn.disabled=false;btn.innerHTML='<i class="fas fa-sync-alt"></i> <span id="rbText">'+T('refresh')+'</span>';
+        if(prog)prog.style.width='100%';
+        setTimeout(function(){
+          var b=document.getElementById('rbBar');
+          if(b){b.style.opacity='0';b.style.transition='opacity .4s';setTimeout(function(){if(b)b.style.display='none'},400);}
+        },600);
+        fd(true);
+      } else {
+        document.getElementById('rbStat').textContent=T('fetched')+' '+s.fetched_count+' '+T('items')+'...';
+      }
+    }catch(e){}
+  },3000);
+  setTimeout(function(){if(refreshing){clearInterval(rci);rci=null;refreshing=false;btn.disabled=false;btn.innerHTML='<i class="fas fa-sync-alt"></i> <span id="rbText">'+T('refresh')+'</span>';var b=document.getElementById('rbBar');if(b)b.style.display='none';}},300000);
+}
+
+function renderSkeleton(){
+  var h='<div class="stats-bar fade-in">';
+  for(var si=0;si<4;si++){h+='<div class="stat-c"><div class="skel" style="height:44px;width:80px;margin:0 auto 8px"></div><div class="skel" style="height:14px;width:60px;margin:0 auto"></div></div>'}
+  h+='</div><div class="sec"><div class="sec-h"><div><div class="skel" style="height:32px;width:200px;margin-bottom:8px"></div><div class="skel" style="height:18px;width:300px"></div></div></div>';
+  for(var si=0;si<3;si++){
+    h+='<div class="cat-section"><div class="cat-header"><div><div class="skel" style="height:24px;width:160px"></div></div></div><div class="repo-grid">';
+    for(var sj=0;sj<3;sj++){
+      h+='<div class="skel-card"><div class="skel skel-h"></div><div class="skel skel-t"></div><div class="skel skel-t w60"></div><div class="skel-row"><div class="skel" style="width:60px;height:16px"></div><div class="skel" style="width:60px;height:16px"></div></div></div>';
+    }
+    h+='</div></div>';
+  }
+  h+='</div>';
+  document.getElementById('app').innerHTML=h;
+}
+
+async function fd(silent){
+  try{
+    if(!silent)renderSkeleton();
+    var r=await fetch('/api/data');
+    if(!r.ok)throw Error();
+    var d=await r.json();
+    if(d.status==='loading'){
+      document.getElementById('app').innerHTML='<div class="loading-c"><div class="loading-s"></div><div class="loading-t">'+d.message+'</div><div class="loading-st">'+T('auto_refreshing')+'</div></div>';
+      setTimeout(function(){fd(true)},10000);
+      return;
+    }
+    renderApp(d);
+  }catch(e){
+    document.getElementById('app').innerHTML='<div class="loading-c"><div class="loading-t" style="color:#ef4444"><i class="fas fa-exclamation-triangle"></i> '+T('conn_fail')+'</div><div class="loading-st">'+T('conn_msg')+'</div><button class="btn btn-primary" onclick="fd()" style="margin-top:16px"><i class="fas fa-redo"></i> '+T('retry')+'</button></div>';
+    us(false);
+  }
+}
+
+// ── GitHub 登录 / Star ──
+var ghUser='', ghLoading=false;
+async function ghLogin(){
+  var btn=document.getElementById('ghText');
+  if(ghLoading)return;
+  if(ghUser){window.location.href='/api/github/logout';return;}
+  ghLoading=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
+  try{
+    var ac=new AbortController();setTimeout(function(){ac.abort()},5000);
+    var r=await fetch('/api/github/user',{signal:ac.signal});
+    if(!r.ok)throw Error();
+    var d=await r.json();
+    if(d.ok){ghUser=d.login;btn.textContent=d.login;document.getElementById('ghBtn').className='btn btn-sm btn-outline';ghLoading=false;return;}
+  }catch(e){}
+  ghLoading=false;
+  window.location.href='/api/github/login';
+}
+async function ghStar(fn,btn){
+  btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
+  try{
+    var ac=new AbortController();setTimeout(function(){ac.abort()},5000);
+    var r=await fetch('/api/github/user',{signal:ac.signal});
+    if(!r.ok)throw Error();var d=await r.json();
+    if(!d.ok){btn.disabled=false;window.location.href='/api/github/login';return;}
+    var act=btn.dataset.starred==='1'?'unstar':'star';
+    var ac2=new AbortController();setTimeout(function(){ac2.abort()},8000);
+    var rr=await fetch('/api/github/'+act,{method:'POST',body:JSON.stringify({repo:fn}),headers:{'Content-Type':'application/json'},signal:ac2.signal});
+    var rd=await rr.json();
+    if(rd.ok){
+      if(act==='star'){btn.dataset.starred='1';btn.innerHTML='<i class="fas fa-star"></i> '+T('starred_btn');btn.className='btn btn-primary';}else{btn.dataset.starred='0';btn.innerHTML='<i class="far fa-star"></i> '+T('star_btn');btn.className='btn btn-outline';}
+    }
+  }catch(e){toast(T('timeout_retry'),'warn');}
+  btn.disabled=false;
+}
+(async function(){
+  try{
+    var ac=new AbortController();setTimeout(function(){ac.abort()},5000);
+    var r=await fetch('/api/github/user',{signal:ac.signal});
+    if(!r.ok)throw Error();
+    var d=await r.json();
+    if(d.ok){ghUser=d.login;document.getElementById('ghText').textContent=d.login;document.getElementById('ghBtn').className='btn btn-sm btn-outline';}
+  }catch(e){}
+  // 检查 OAuth 错误
+  var p=new URLSearchParams(location.search);
+  if(p.get('error')==='login_failed'){toast(T('login_failed'),'warn');history.replaceState(null,'',location.pathname);}
+})();
+
+fd();
+setInterval(function(){fd(true)},60000);
+</script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+# 环境变量（包含真实密钥，不要提交）
+.env
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+
+# 启动日志
+startup.log
+startup.err
+
+# 临时文件
+*.tmp
+.DS_Store
+Thumbs.db
+
+# 数据缓存（过大，用户运行后自行生成）
+cached_data.json
+cached_data.json.tmp
+
+# 项目数据目录（Claude 调度任务等）
+.claude/
+
+# 本地 MCP 配置（机器相关）
+.mcp.json
+
+# Claude 技能 / Agent 配置
+.agents/
