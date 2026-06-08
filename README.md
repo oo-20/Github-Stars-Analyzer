@@ -20,6 +20,9 @@
 
 > Tired of missing great GitHub projects? GitHub Stars Analyzer automatically crawls, categorizes, and ranks trending repositories so you never miss a gem.
 
+![Overview](screenshots/整体界面.png)
+![Card Detail](screenshots/卡片内容.png)
+
 ## Features
 
 - **Multi-dimension browsing** — AI Agent, Computer Science, LLM, Developer Tools, Rising Stars (fast-growing low-star projects)
@@ -120,11 +123,6 @@ github-stars-analyzer/
 | Data | REST API, JSON file cache |
 | Tools | Docker, docker-compose |
 
-## Screenshots
-
-![Overview](screenshots/整体界面.png)
-![Card Detail](screenshots/卡片内容.png)
-
 ## License
 
 MIT
@@ -135,6 +133,9 @@ MIT
 # 中文
 
 > 如果你还在为总是错过 GitHub 上的优质项目而苦恼，不妨试试 GitHub Stars Analyzer！它自动爬取、分类、排名 GitHub 上的热门仓库，让你不再错过好项目。
+
+![总览页](screenshots/整体界面.png)
+![项目详情](screenshots/卡片内容.png)
 
 ## 功能
 
@@ -235,11 +236,6 @@ github-stars-analyzer/
 | 前端 | 纯 JavaScript（零框架）、CSS 变量 |
 | 数据 | REST API、文件缓存（JSON） |
 | 工具 | Docker, docker-compose |
-
-## 截图
-
-![总览页](screenshots/整体界面.png)
-![项目详情](screenshots/卡片内容.png)
 
 ## License
 
