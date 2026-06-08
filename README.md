@@ -16,7 +16,7 @@
 ---
 
 <a name="english"></a>
-# 🇬🇧 English
+# English
 
 > Tired of missing great GitHub projects? GitHub Stars Analyzer automatically crawls, categorizes, and ranks trending repositories so you never miss a gem.
 
@@ -132,7 +132,7 @@ MIT
 ---
 
 <a name="chinese"></a>
-# 🇨🇳 中文
+# 中文
 
 > 如果你还在为总是错过 GitHub 上的优质项目而苦恼，不妨试试 GitHub Stars Analyzer！它自动爬取、分类、排名 GitHub 上的热门仓库，让你不再错过好项目。
 
